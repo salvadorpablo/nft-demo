@@ -22,6 +22,8 @@ def main():
         metadata_file_name = (
             f"./metadata/{network.show_active()}/{token_id}-{breed}.json"
         )
+
+        # check if metadata already exists 
         collectible_metadata = metadata_template
         if Path(metadata_file_name).exists():
             print(f"{metadata_file_name} already exists! Delete it to overwrite")
@@ -47,14 +49,15 @@ def main():
 
 
 def upload_to_ipfs(filepath):
-    with Path(filepath).open("rb") as fp:
+    with Path(filepath).open("rb") as fp: # rb to open it as binary
         image_binary = fp.read()
+
+        # upload (instructions on https://docs.ipfs.io)
         ipfs_url = "http://127.0.0.1:5001"
         endpoint = "/api/v0/add"
         response = requests.post(ipfs_url + endpoint, files={"file": image_binary})
         ipfs_hash = response.json()["Hash"]
-        # "./img/0-PUG.png" -> "0-PUG.png"
-        filename = filepath.split("/")[-1:][0]
+        filename = filepath.split("/")[-1:][0] # "./img/0-PUG.png" -> "0-PUG.png"
         image_uri = f"https://ipfs.io/ipfs/{ipfs_hash}?filename={filename}"
         print(image_uri)
         return image_uri
